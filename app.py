@@ -58,5 +58,27 @@ def save_diary():
 
     return jsonify({'msg':'Upload complete!'})
 
+@app.route('/diary/random', methods=['POST'])
+def random_diary():
+    title_receive = request.form["title_give"]
+    content_receive = request.form["content_give"]
+    profilephoto = request.form["profile_give"]
+    file = request.form["file_give"]
+    today = datetime.now()  
+    thisdate = today.strftime("%Y-%m-%d")
+    
+
+    doc = {
+        'profile':profilephoto,
+        'img':file,
+        'title':title_receive,
+        'content':content_receive,
+        'date':thisdate
+    }
+    db.diary.insert_one(doc)
+
+    return jsonify({'msg':'Upload complete!'})
+
+
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
