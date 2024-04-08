@@ -54,7 +54,7 @@ def save_diary():
         'content':content_receive,
         'date':thisdate
     }
-    db.diary.insert_one(doc)
+    db.debugger.insert_one(doc)
 
     return jsonify({'msg':'Upload complete!'})
 
@@ -75,7 +75,7 @@ def random_diary():
         'content':content_receive,
         'date':thisdate
     }
-    db.diary.insert_one(doc)
+    db.debugger.insert_one(doc)
 
     return jsonify({'msg':'Upload complete!'})
 
