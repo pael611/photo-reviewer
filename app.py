@@ -30,12 +30,15 @@ def save_diary():
     title_receive = request.form["title_give"]
     content_receive = request.form["content_give"]
     
-    count = db.diary.count_documents({})
-    num = count + 1
-    
-    
-    while db.diary.find_one({'num': num}):  
-        num += 1
+    highest_num_doc = db.diary.find_one(sort=[("id", -1)])
+
+    if highest_num_doc:
+        highest_num = highest_num_doc["id"]
+    else:
+         highest_num = 0
+
+# Tentukan nomor baru yang unik
+    new_num = highest_num + 1
     
     today = datetime.now()
     date_time = today.strftime("%Y-%m-%d-%H-%M-%S")
@@ -56,7 +59,7 @@ def save_diary():
   
 
     doc = {
-        'id':num,
+        'id':new_num,
         'profile':save_profile,
         'img':save_to,
         'title':title_receive,
@@ -79,16 +82,19 @@ def random_diary():
     thisdate = today.strftime("%Y-%m-%d")
     information = request.form["info"]
     
-    count = db.diary.count_documents({})
-    num = count + 1
-    
-    
-    while db.diary.find_one({'num': num}):  
-        num += 1
-    
+    highest_num_doc = db.diary.find_one(sort=[("id", -1)])
+
+    if highest_num_doc:
+        highest_num = highest_num_doc["id"]
+    else:
+         highest_num = 0
+
+# Tentukan nomor baru yang unik
+    new_num = highest_num + 1
+   
 
     doc = {
-        'id':num,
+        'id':new_num,
         'profile':profilephoto,
         'img':file,
         'title':title_receive,
