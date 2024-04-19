@@ -13,7 +13,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-        <!-- <link rel="stylesheet" href="../static/bootstrap.min.css"> -->
+    <!-- <link rel="stylesheet" href="../static/bootstrap.min.css"> -->
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -27,7 +27,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Jua&amp;display=swap" rel="stylesheet" />
 
     <style>
-        .form, .form-control{
+        .form,
+        .form-control {
             border-radius: 30px;
             object-fit: cover;
             max-width: auto;
@@ -38,19 +39,21 @@
             justify-content: center;
             font-size: 90%;
         }
-      
-  
-      .content-container{
-         display: flex; 
-    flex-direction: column;
-}
-       .horizontal-line {
-    border-bottom: 1px solid black; 
-    width: 100%; 
 
-} 
-      .card-img-top{
-         border-radius: 30px;
+
+        .content-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .horizontal-line {
+            border-bottom: 1px solid black;
+            width: 100%;
+
+        }
+
+        .card-img-top {
+            border-radius: 30px;
             object-fit: cover;
             max-width: auto;
             max-height: 200px;
@@ -58,8 +61,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-        
-      }
+
+        }
+
         * {
             padding: 0;
             margin: 0;
@@ -71,27 +75,28 @@
         }
 
         .card-text {
-          max-height: 50px; 
-          overflow-y:auto; 
+            max-height: 50px;
+            overflow-y: auto;
         }
 
-        .form-container   {
+        .form-container {
             border-radius: 30px;
             box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
             width: auto;
             height: auto;
             max-width: 500px;
-          max-height: auto;
-                       
-           
+            max-height: auto;
+
+
         }
-      .card{
-        height:auto;
-        max-height:500px;
-        border-radius:30px;
-        
-      }
-        
+
+        .card {
+            height: 500px;
+            border-radius: 30px;
+            overflow-y: auto;
+
+        }
+
 
         .profilepic {
             max-width: 100px;
@@ -114,52 +119,86 @@
                 success: function (response) {
                     let articles = response["articles"];
                     for (let i = 0; i < articles.length; i++) {
+                        let id = articles[i]["id"];
                         let profile = articles[i]["profile"];
                         let date = articles[i]["date"];
                         let img = articles[i]["img"];
                         let title = articles[i]["title"];
                         let content = articles[i]["content"];
+                        let info = articles[i]["info"];
+                        let dateupdate = articles[i]["date-updated"];
+                        let infoHTML = '';
+                        let editButtonHTML = '';
+                        if (dateupdate != null) {
+                            showDateUpdate = `<div id="editinfo"> ${dateupdate}`;
+                            editButtonHTML = `<button type="button" onclick="editclick('${id}','${title}','${content}')" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                                EDIT
+                                                </button>`;
+                            showOption = `<div class="horizontal-line"> </div><br>posted at ${date} ${showDateUpdate} </div>`;
+
+                        } else {
+                            showDateUpdate = `<div id="editinfo" hidden> ${dateupdate}`;
+                            editButtonHTML = `<button type="button" onclick="editclick('${id}','${title}','${content}')" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                                EDIT
+                                                </button>`;
+                            showOption = `</div><br>posted at ${date}</div>`;
+                        }
+                        if (info) {
+                            infoHTML = `<br><i>${info}</i>`;
+                            editButtonHTML = `<div hidden></div>`;
+                            showOption = `</div><br>posted at ${date} ${infoHTML}</div>`;
+                        } else {
+                            editButtonHTML = `<button type="button" onclick="editclick('${id}','${title}','${content}')" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                                EDIT
+                                                </button>`;
+                        }
                         let temp_html = `
-        <div class="content-container coxxl-12 col-md-6 col-lg-4 mb-4">
-          <div class="card">
-          <div class="content">
-        <div class="card-header">
-            <img
-              src=${img}
-              class="card-img-top "
-              alt="..."
-            />
-        </div>
+<div class="content-container col-12 col-md-6 col-lg-4 mb-4">
+    <div class="card">
+        <div class="content">
+            <div class="card-header">
+                <img src="${img}" class="card-img-top " alt="...">
+            </div>
             <div class="card-body">
-                <div class = "image-container mb-2">
-                        <img            
-                    src=${profile}
-                    class="card-img-top profilepic rounded-circle object-fit-sm-contain "
-                    alt="..."
-                    />
+                <div class="image-container mb-2">
+                    <img src="${profile}" class="card-img-top profilepic rounded-circle object-fit-sm-contain " alt="...">
                 </div>
-              <h5 class="card-title">${title}</h5>
-              <p class="card-text">${content}<br> <div class="horizontal-line"></div><br>posted at ${date} </p>
+                <h5 class="card-title">${title}</h5>
+                <p class="card-text">${content}<br> 
+                <div class="horizontal-line"></div>
+                <br>posted at ${date} ${infoHTML} ${showDateUpdate} </div></p>
+                <button type="button" onclick='deletedata(${id})' class="btn btn-danger">Delete</button>
+                ${editButtonHTML}
             </div>
-            </div>
-          </div>
         </div>
-                `;
+    </div>
+</div>
+`;
                         $("#cards-box").append(temp_html);
                     }
                 },
             });
         }
+
+
+        function escape(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         function posting() {
-            let title = $("#image-title").val();
+            let title = escape($("#image-title").val());
             if (!title) {
                 return alert("Hey user, you forgot a title");
             }
-            let content = $("#image-description").val();
+            let content = escape($("#image-description").val());
             if (!content) {
                 return alert("Hey user, you forgot a description");
             }
-
             let file = $("#image").prop("files")[0];
             let profile = $("#image2").prop("files")[0];
 
@@ -180,6 +219,42 @@
                     window.location.reload();
                 },
             });
+        }
+
+
+        function editclick(id, title, content) {
+            $('#editId').val(id);
+            $('#editTitle').text(title);
+            $('#editTitleform').val(title);
+            $('#editContent').val(content);
+            $('#editModal').val('show');
+        }
+        function editconfirm() {
+            let id = $('#editId').val();
+            let newTitle = $('#editTitleform').val();
+            let newContent = $('#editContent').val();
+            let file = $("#editimage").prop("files")[0];
+            let profile = $("#editimage2").prop("files")[0];
+
+            let form_data = new FormData();
+            form_data.append("id_give", id);
+            form_data.append("newTitle_give", newTitle);
+            form_data.append("newContent_give", newContent);
+            form_data.append("newFile_give", file);
+            form_data.append("newProfile_give", profile);
+
+            $.ajax({
+                type: "POST",
+                url: "/diary/edit",
+                data: form_data,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    console.log(response);
+                    window.location.reload();
+                },
+            });
+
         }
 
 
@@ -206,7 +281,7 @@
                 data: {},
             });
 
-            // Tidak perlu promise3 di sini
+
 
             promises.push(promise1);
             promises.push(promise2);
@@ -222,6 +297,7 @@
                     let postProfile = response1['results'][0]['picture']['large'];
                     let postPicture = response2['message'];
                     let dogAbout = response3['data'][0]['attributes']['body'];
+                    let keterangan = "Random Image and Profile Picture Cannot Be Edited! Be Carefull!"
 
                     let title = $("#image-title").val();
 
@@ -231,8 +307,9 @@
                     // Setelah mendapatkan title dan content, tambahkan data ke form_data
                     form_data.append("profile_give", postProfile);
                     form_data.append("file_give", postPicture);
-                    form_data.append("title_give", profileName); // Sekarang tambahkan title_give
+                    form_data.append("title_give", profileName);
                     form_data.append("content_give", dogAbout);
+                    form_data.append("info", keterangan);
 
                     // Setelah semua data ditambahkan, lakukan panggilan AJAX untuk promise3
                     $.ajax({
@@ -257,7 +334,19 @@
         }
 
 
-  
+        function deletedata(id) {
+            $.ajax({
+                type: "POST",
+                url: "/diary/delete",
+                data: {
+                    "id_give": id
+                },
+                success: function (response) {
+                    window.location.reload();
+                },
+            });
+
+        }
 
     </script>
 
@@ -270,35 +359,83 @@
         <div class=" bg-success-subtle form-container">
             <div class="container-fluid py-5 form-container">
                 <h1 class="display-5 fw-bold text-black">Personal Diary</h1>
+                <!-- FORM INPUT PHOTO  -->
+                <p class="col-md-8 fs-4 text-black">Post your favorite photo here!</p>
                 <div class="mb-3 custom-file form">
-                    <div class="position-relative"><span class="bg-success rounded-1 p-1 form"><strong>Upload Image Post Here!</strong></span></div>
+                    <div class="position-relative"><span class="bg-success rounded-1 p-1 form"><strong>Upload Image Post
+                                Here!</strong></span></div>
                     <input class="form-control" type="file" id="image" />
-                   
+
                 </div>
                 <div class="mb-3 custom-file form">
-                    <div class="position-relative"><span class="bg-success form rounded-1 p-1"><strong>Upload Your Profile Photo Here!</strong></span></div>
+                    <div class="position-relative"><span class="bg-success form rounded-1 p-1"><strong>Upload Your
+                                Profile Photo Here!</strong></span></div>
                     <input class="form-control" type="file" id="image2" />
                 </div>
 
 
                 <div class="mb-3 form">
-                    <input type="text" class="form-control form" id="image-title" placeholder="The title of your image" />
+                    <input type="text" class="form-control form" id="image-title"
+                        placeholder="The title of your image" />
                 </div>
                 <div class="mb-3">
-                    <textarea placeholder="The description of your image" class="form-control form" id="image-description"
-                        rows="3"></textarea>
+                    <textarea placeholder="The description of your image" class="form-control form"
+                        id="image-description" rows="3"></textarea>
                 </div>
                 <button type="button" onclick="posting() " class="btn btn-success ">Save</button>
                 <button type="button" onclick="random()" class="btn btn-warning ">Create Random!</button>
             </div>
         </div>
-
     </div>
-  
     <div class="row justify-content-start row-cols-1 row-cols-md-3 g-4 py-5" id="cards-box">
-
     </div>
-  
+
+
+
+
+    <!-- MODAL EDIT DISINI -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                        <h2 id="editTitle"></h2>
+                    </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" id="editId" hidden>
+
+                    <div class="position-relative"><span class="bg-success rounded-1 p-1 form"><strong>Update Image Post
+                                Here!</strong></span></div>
+                    <input class="form-control" type="file" id="editimage" />
+
+                    <div class="mb-3 custom-file form">
+                        <div class="position-relative"><span class="bg-success form rounded-1 p-1"><strong>Update Your
+                                    Profile Photo Here!</strong></span></div>
+                        <input class="form-control" type="file" id="editimage2" />
+                    </div>
+
+
+                    <span>Edit Title Here</span>
+                    <input type="text" class="form-control mb-3" id="editTitleform">
+
+                    <span>Edit Content Here</span>
+                    <textarea class="form-control" id="editContent" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" type="submit" onclick="editconfirm()" class="btn btn-primary">Edit!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
 </body>
 
 </html>
