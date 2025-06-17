@@ -1,8 +1,9 @@
 from http import client
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify,redirect
 from pymongo import MongoClient
 from dotenv import load_dotenv
+from pathlib import Path
 import os
 from os.path import join, dirname
 
@@ -125,36 +126,46 @@ def deletedata():
     return jsonify({'msg':'Delete complete!'})
 
 
-@app.route('/diary/edit', methods=['POST'])
-def edit_data():
-    id_receive = request.form['id_give']
+@app.route('/diary/edit/<id>', methods=['POST','GET'])
+def edit_data(id):
+    if request.method == 'GET':
+        article = list(db.diary.find({'id': int(id)}, {'_id': False}))
+        print(article)
+        return render_template('editPost.html', article=article)
+    id_receive = id
     newTitle_receive = request.form['newTitle_give']
     newContent_receive = request.form['newContent_give']
-    newFile_receive = request.files.get('newFile_give')  # Menggunakan get() untuk menghindari KeyError jika tidak ada file_receive yang diberikan
-    newProfile_receive = request.files.get('newProfile_give')  # Menggunakan get() untuk menghindari KeyError jika tidak ada profile_receive yang diberikan
+    newFile_receive = request.files.get('newFile_give')  
+    newProfile_receive = request.files.get('newProfile_give')  
     
     file_img = db.diary.find_one({'id': int(id_receive)})['img']
     file_profile = db.diary.find_one({'id': int(id_receive)})['profile']
 
-    if newFile_receive and os.path.exists(file_img):
-        os.remove(file_img)
-    else:
-        print('The file Image does not exist or no new file provided')
+    img_path = Path(file_img)
+    profile_path = Path(file_profile)
 
-    if newProfile_receive and os.path.exists(file_profile):
-        os.remove(file_profile)
+    if newFile_receive and img_path.exists():
+        img_path.unlink()
     else:
-        print('The file Profile does not exist or no new profile provided')
+        print(' File image tidak ada atau sudah terganti!')
 
-    update_data = {'title': newTitle_receive, 'content': newContent_receive, 'date-updated':"Edited at : "+datetime.now().strftime("%Y-%m-%d (%H.%M)")}
-    
+    if newProfile_receive and profile_path.exists():
+        profile_path.unlink()
+    else:
+        print('File image tidak ada atau sudah terganti!')
+
+    update_data = {'title': newTitle_receive, 
+                   'content': newContent_receive, 
+                   'date-updated': "Edited at : " + datetime.now().strftime("%Y-%m-%d (%H.%M)")
+                   }
+
     if newFile_receive:
         today = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         extensionprofile = newFile_receive.filename.split('.')[-1]
         save_profile = f'static/profile/profile{today}.{extensionprofile}'
-        newFile_receive.save(save_profile)  
+        newFile_receive.save(save_profile)
         update_data['img'] = save_profile
-        
+
     if newProfile_receive:
         today = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         extension = newProfile_receive.filename.split('.')[-1]
@@ -164,9 +175,19 @@ def edit_data():
 
     db.diary.update_one({'id': int(id_receive)},
                         {'$set': update_data})
-    
-    return jsonify({'msg': 'SUCCESS UPDATE!'})
 
+    return redirect('/')
+# @app.route('/perkalian', methods=['POST'])
+# def perkalian():
+#     if request.method == 'POST':
+#        angka1 = request.form['angka1']
+#        angka2 = request.form['angka2']
+#        hasil  = int(angka1) * int(angka2)
+#        return jsonify({'hasilnya adalah : ': hasil})
+        
+#         for x in range(5):
+#          print(x)
+            
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)

@@ -21,7 +21,7 @@
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js"></script>
 
-    <title>Rafael Mini Project | Post Your favorite Photo</title>
+    <title>Rafael Gallery</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link href="https://fonts.googleapis.com/css2?family=Jua&amp;display=swap" rel="stylesheet" />
@@ -70,13 +70,9 @@
             box-sizing: border-box;
         }
 
-        body {
-            background-color: #f9f6f2;
-        }
 
         .card-text {
-            max-height: 50px;
-            overflow-y: auto;
+            max-height: 500px;
         }
 
         .form-container {
@@ -131,16 +127,16 @@
                         let editButtonHTML = '';
                         if (dateupdate != null) {
                             showDateUpdate = `<div id="editinfo"> ${dateupdate}`;
-                            editButtonHTML = `<button type="button" onclick="editclick('${id}','${title}','${content}')" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                            editButtonHTML = `<a href="/diary/edit/${id}"><button type="button" class="btn btn-warning" data-bs-toggle="" data-bs-target="">
                                                 EDIT
-                                                </button>`;
+                                                </button></a>`;
                             showOption = `<div class="horizontal-line"> </div><br>posted at ${date} ${showDateUpdate} </div>`;
 
                         } else {
                             showDateUpdate = `<div id="editinfo" hidden> ${dateupdate}`;
-                            editButtonHTML = `<button type="button" onclick="editclick('${id}','${title}','${content}')" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                                EDIT
-                                                </button>`;
+                            editButtonHTML = `<a href="/diary/edit/${id}"><button type="button" class="btn btn-warning" data-bs-toggle="" data-bs-target="">
+                                            EDIT
+                                            </button></a>`;
                             showOption = `</div><br>posted at ${date}</div>`;
                         }
                         if (info) {
@@ -148,9 +144,9 @@
                             editButtonHTML = `<div hidden></div>`;
                             showOption = `</div><br>posted at ${date} ${infoHTML}</div>`;
                         } else {
-                            editButtonHTML = `<button type="button" onclick="editclick('${id}','${title}','${content}')" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                            editButtonHTML = `<a href="/diary/edit/${id}"><button type="button" class="btn btn-warning" data-bs-toggle="" data-bs-target="">
                                                 EDIT
-                                                </button>`;
+                                                </button></a>`;
                         }
                         let temp_html = `
 <div class="content-container col-12 col-md-6 col-lg-4 mb-4">
@@ -180,7 +176,7 @@
             });
         }
 
-
+        //filter inputan user
         function escape(str) {
             return str
                 .replace(/&/g, "&amp;")
@@ -222,40 +218,6 @@
         }
 
 
-        function editclick(id, title, content) {
-            $('#editId').val(id);
-            $('#editTitle').text(title);
-            $('#editTitleform').val(title);
-            $('#editContent').val(content);
-            $('#editModal').val('show');
-        }
-        function editconfirm() {
-            let id = $('#editId').val();
-            let newTitle = $('#editTitleform').val();
-            let newContent = $('#editContent').val();
-            let file = $("#editimage").prop("files")[0];
-            let profile = $("#editimage2").prop("files")[0];
-
-            let form_data = new FormData();
-            form_data.append("id_give", id);
-            form_data.append("newTitle_give", newTitle);
-            form_data.append("newContent_give", newContent);
-            form_data.append("newFile_give", file);
-            form_data.append("newProfile_give", profile);
-
-            $.ajax({
-                type: "POST",
-                url: "/diary/edit",
-                data: form_data,
-                contentType: false,
-                processData: false,
-                success: function (response) {
-                    console.log(response);
-                    window.location.reload();
-                },
-            });
-
-        }
 
 
 
@@ -354,11 +316,19 @@
 
 </head>
 
-<body class="bg-danger-subtle p-5 m-2 container-xxl">
+<body class="bg-dark-subtle m-2 ">
+    <!-- <form action="/perkalian" method="post">
+        <input type="number" name="angka1">
+        <input type="number" name="angka2">
+        <button type="submit" class="button">Hitung!</button>
+    </form> -->
     <div class="container font text-bg-dark p-3  form-container">
-        <div class=" bg-success-subtle form-container">
+       
+        <br>
+        <div class=" bg-dark-subtle  form-container">
             <div class="container-fluid py-5 form-container">
-                <h1 class="display-5 fw-bold text-black">Personal Diary</h1>
+                <h1 class="display-5 fw-bold text-black">POST YOUR PHOTO!</h1>
+                <h5 class="text-black">Simpan Foto kenangan kamu kedalam sini dan berikan kesan kamu pada saat itu!</h5>
                 <!-- FORM INPUT PHOTO  -->
                 <p class="col-md-8 fs-4 text-black">Post your favorite photo here!</p>
                 <div class="mb-3 custom-file form">
@@ -384,58 +354,20 @@
                 </div>
                 <button type="button" onclick="posting() " class="btn btn-success ">Save</button>
                 <button type="button" onclick="random()" class="btn btn-warning ">Create Random!</button>
+                <h5 class="text-black"><i>Klik pada Create Random! Dan temukan Hal menarik</i></h5>
             </div>
         </div>
     </div>
     <div class="row justify-content-start row-cols-1 row-cols-md-3 g-4 py-5" id="cards-box">
     </div>
-
-
-
-
-    <!-- MODAL EDIT DISINI -->
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                        <h2 id="editTitle"></h2>
-                    </h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="text" class="form-control" id="editId" hidden>
-
-                    <div class="position-relative"><span class="bg-success rounded-1 p-1 form"><strong>Update Image Post
-                                Here!</strong></span></div>
-                    <input class="form-control" type="file" id="editimage" />
-
-                    <div class="mb-3 custom-file form">
-                        <div class="position-relative"><span class="bg-success form rounded-1 p-1"><strong>Update Your
-                                    Profile Photo Here!</strong></span></div>
-                        <input class="form-control" type="file" id="editimage2" />
-                    </div>
-
-
-                    <span>Edit Title Here</span>
-                    <input type="text" class="form-control mb-3" id="editTitleform">
-
-                    <span>Edit Content Here</span>
-                    <textarea class="form-control" id="editContent" rows="3"></textarea>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" type="submit" onclick="editconfirm()" class="btn btn-primary">Edit!</button>
-                </div>
-            </div>
-        </div>
     </div>
 
 
 
 
 
+
+    {% include 'footer.html' %}
 </body>
 
 </html>
